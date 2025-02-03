@@ -11,6 +11,7 @@
     <groupId>org.example</groupId>
     <artifactId>modbus-backend</artifactId>
     <version>0.0.1-SNAPSHOT</version>
+    <packaging>pom</packaging>
     <name>modbus-backend</name>
     <description>modbus-backend</description>
     <url/>
@@ -20,6 +21,11 @@
     <developers>
         <developer/>
     </developers>
+    <modules>
+        <module>modbus</module>
+        <module>api</module>
+        <module>database</module>
+    </modules>
     <scm>
         <connection/>
         <developerConnection/>
