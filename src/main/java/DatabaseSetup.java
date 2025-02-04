@@ -4,10 +4,10 @@ import java.sql.SQLException;
 
 public class DatabaseSetup {
     public static void createTable() {
-        String sql = "CREATE TABLE IF NOT EXISTS users ("
+        String sql = "CREATE TABLE IF NOT EXISTS temperature  ("
                 + "id INTEGER PRIMARY KEY AUTOINCREMENT, "
-                + "name TEXT NOT NULL, "
-                + "email TEXT UNIQUE NOT NULL)";
+                + "temp REAL NOT NULL, "
+                + "date TEXT NOT NULL)";
 
         try (Connection conn = DatabaseConnection.connect();
              Statement stmt = conn.createStatement()) {
