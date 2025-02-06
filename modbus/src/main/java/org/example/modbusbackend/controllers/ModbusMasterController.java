@@ -3,6 +3,7 @@ package org.example.modbusbackend.controllers;
 import org.example.modbusbackend.services.ModbusMasterService;
 import org.springframework.web.bind.annotation.*;
 
+@CrossOrigin(origins = "http://localhost:5173")
 @RestController
 @RequestMapping("/modbus/master")
 public class ModbusMasterController {
