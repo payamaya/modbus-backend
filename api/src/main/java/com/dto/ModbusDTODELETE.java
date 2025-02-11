@@ -1,6 +1,6 @@
-package org.example.modbusbackend.Modbusses;
+package com.dto;
 
-public class ModbusDTO {
+/*public class ModbusDTODELETE {
     private int slaveId;
     private int startAddress;
     private int registerQuantity;
@@ -46,4 +46,4 @@ public class ModbusDTO {
     public void setWriteRequest(boolean writeRequest) {
         isWriteRequest = writeRequest;
     }
-}
+}*/

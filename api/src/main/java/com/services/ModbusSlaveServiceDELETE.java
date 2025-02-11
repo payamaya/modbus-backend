@@ -1,4 +1,4 @@
-package org.example.modbusbackend.services;
+/*package com.services;
 
 import com.ghgande.j2mod.modbus.facade.ModbusTCPMaster;
 import com.ghgande.j2mod.modbus.procimg.Register;
@@ -6,10 +6,10 @@ import com.ghgande.j2mod.modbus.procimg.SimpleRegister;
 import org.springframework.stereotype.Service;
 
 @Service
-public class ModbusSlaveService {
+public class ModbusSlaveServiceDELETE {
     private final ModbusTCPMaster modbusMaster;
 
-    public ModbusSlaveService() {
+    public ModbusSlaveServiceDELETE() {
         this.modbusMaster = new ModbusTCPMaster("127.0.0.1", 502);
     }
 
@@ -54,4 +54,4 @@ public class ModbusSlaveService {
             return null;
         }
     }
-}
+}*/

@@ -22,9 +22,9 @@
         <developer/>
     </developers>
     <modules>
-        <module>modbus</module>
         <module>api</module>
         <module>database</module>
+        <module>modbus</module>
     </modules>
     <scm>
         <connection/>
