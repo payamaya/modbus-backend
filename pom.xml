@@ -32,9 +32,6 @@
         <tag/>
         <url/>
     </scm>
-    <properties>
-        <java.version>23</java.version>
-    </properties>
     <dependencies>
         <dependency>
             <groupId>com.ghgande</groupId>
