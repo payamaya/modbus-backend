@@ -3,7 +3,6 @@ import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.nio.charset.StandardCharsets;
 
 public class TempDAO {
     public static void insertTemp(double temp) {
