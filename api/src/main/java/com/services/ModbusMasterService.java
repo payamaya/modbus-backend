@@ -90,32 +90,4 @@ public class ModbusMasterService {
             //throw new RuntimeException(e);
         }
     }
-
-    // Read multiple registers (Holding Registers)
-    /*public ResponseEntity<Map<String, Integer[]>> readHoldingRegister(int slaveId, int address, int numRegisters) {
-        try {
-            if (!modbusMaster.isConnected()) {
-                modbusMaster.connect();
-            }
-
-            // Read multiple registers from the slave
-            Register[] registers = modbusMaster.readMultipleRegisters(slaveId, address, numRegisters);
-            Integer[] values = new Integer[numRegisters];
-
-            // Convert the registers to their respective values
-            for (int i = 0; i < numRegisters; i++) {
-                values[i] = registers[i].getValue();
-            }
-
-            modbusMaster.disconnect();
-
-            // Return the values in a Map
-            Map<String, Integer[]> response = Collections.singletonMap("values", values);
-            return ResponseEntity.ok(response);
-        } catch (Exception e) {
-            e.printStackTrace();
-            return ResponseEntity.badRequest().body(Collections.singletonMap("error", new Integer[] {-1}));
-        }
-    }*/
-
 }

@@ -7,13 +7,6 @@ public class ModbusWriteSingleRegisterRequestDTO {
 
     //TODO: Change these ints to shorts to better reflect the Modbus data standard?
 
-
-    // Constructor
-    /*public ModbusReadResponseDTO(int address, boolean value) {
-        this.address = address;
-        this.value = value;
-    }*/
-
     public int getSlaveId() {
         return slaveId;
     }

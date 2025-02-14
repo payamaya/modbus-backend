@@ -1,7 +1,6 @@
 package com.controllers;
 
 import com.dto.ModbusWriteSingleRegisterRequestDTO;
-import com.services.ModbusMasterService;
 import com.services.ModbusSlaveService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -12,12 +11,6 @@ import org.springframework.web.bind.annotation.*;
 public class ModbusSlaveController {
 
     private final ModbusSlaveService modbusSlaveService;
-
-
-    /*@PostMapping("/write")
-    public String writeData(@RequestParam int slaveId, @RequestParam int address, @RequestParam int value) {
-        return "Data written to Slave " + slaveId + " at address " + address + " with value " + value;
-    }*/
 
     public ModbusSlaveController(ModbusSlaveService modbusSlaveService) {
         this.modbusSlaveService = modbusSlaveService;
