@@ -1,10 +1,10 @@
-package org.example.modbusbackend.controllers;
+package com.controllers;
 
-import org.example.modbusbackend.services.ModbusMasterService;
+import com.dto.ModbusReadRequestDTO;
+import com.dto.ModbusReadResponseDTO;
+import com.services.ModbusMasterService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.Map;
 
 @CrossOrigin(origins = "http://localhost:5173")
 @RestController
@@ -18,11 +18,17 @@ public class ModbusMasterController {
 
     // Endpoint to read multiple registers from the master
     @GetMapping("/read")
-    public ResponseEntity<Map<String, Integer[]>> readData(
+    public ResponseEntity<ModbusReadResponseDTO> readData(
             @RequestParam int slaveId,
             @RequestParam int address,
             @RequestParam int numRegisters) {
-        return modbusMasterService.readHoldingRegister(slaveId, address, numRegisters);
+
+        ModbusReadRequestDTO modbusReadRequestDTO = new ModbusReadRequestDTO();
+        modbusReadRequestDTO.setSlaveId(slaveId);
+        modbusReadRequestDTO.setAddress(address);
+        modbusReadRequestDTO.setNumRegisters(numRegisters);
+
+        return modbusMasterService.readRegisters(modbusReadRequestDTO);
     }
 
 

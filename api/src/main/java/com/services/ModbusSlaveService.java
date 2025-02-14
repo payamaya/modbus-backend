@@ -1,9 +1,7 @@
-package org.example.modbusbackend.Modbusses;
+package com.services;
 
-import com.ghgande.j2mod.modbus.ModbusException;
+import com.dto.ModbusWriteSingleRegisterRequestDTO;
 import com.ghgande.j2mod.modbus.io.ModbusTCPTransaction;
-import com.ghgande.j2mod.modbus.msg.ReadMultipleRegistersRequest;
-import com.ghgande.j2mod.modbus.msg.ReadMultipleRegistersResponse;
 import com.ghgande.j2mod.modbus.msg.WriteSingleRegisterRequest;
 import com.ghgande.j2mod.modbus.net.TCPMasterConnection;
 import com.ghgande.j2mod.modbus.procimg.SimpleRegister;
@@ -16,7 +14,7 @@ import java.net.InetAddress;
 
 
 @Service
-public class ModbusService {
+public class ModbusSlaveService {
 
     private TCPMasterConnection connection;
 
@@ -55,37 +53,19 @@ public class ModbusService {
         }
     }
 
-    public ReadMultipleRegistersResponse readRegisters(ModbusDTO modbusDTO) {
-        try {
-            ReadMultipleRegistersRequest request = new ReadMultipleRegistersRequest(modbusDTO.getStartAddress(), modbusDTO.getRegisterQuantity());
-            request.setUnitID(modbusDTO.getSlaveId());
-
-            ModbusTCPTransaction transaction = new ModbusTCPTransaction(connection);
-            transaction.setRequest(request);
-            transaction.execute();
-
-            return (ReadMultipleRegistersResponse) transaction.getResponse();
-        } catch (ModbusException e) {
-            throw new RuntimeException("Error reading Modbus registers.", e);
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-
-    public String writeRegister(ModbusDTO modbusDTO) {
+    public String writeRegister(ModbusWriteSingleRegisterRequestDTO modbusWriteRequestDTO) {
         try {
             WriteSingleRegisterRequest request = new WriteSingleRegisterRequest();
-            request.setUnitID(modbusDTO.getSlaveId());
-            request.setReference(modbusDTO.getStartAddress());
-            SimpleRegister register = new SimpleRegister(modbusDTO.getRegisterValue());
+            request.setUnitID(modbusWriteRequestDTO.getSlaveId());
+            request.setReference(modbusWriteRequestDTO.getAddress());
+            SimpleRegister register = new SimpleRegister(modbusWriteRequestDTO.getRegisterValue());
             request.setRegister(register);
 
             ModbusTCPTransaction transaction = new ModbusTCPTransaction(connection);
             transaction.setRequest(request);
             transaction.execute();
 
-            return "Wrote value: " + modbusDTO.getRegisterValue() + " to register at address: " + modbusDTO.getStartAddress();
+            return "Wrote value: " + modbusWriteRequestDTO.getRegisterValue() + " to register at address: " + modbusWriteRequestDTO.getAddress();
         } catch (Exception e) {
             throw new RuntimeException("Error writing to Modbus register.", e);
         }
