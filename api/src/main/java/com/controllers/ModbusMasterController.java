@@ -1,7 +1,6 @@
 package com.controllers;
 
-import com.dto.ModbusReadRequestDTO;
-import com.dto.ModbusReadResponseDTO;
+import com.dto.*;
 import com.services.ModbusMasterService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -29,6 +28,34 @@ public class ModbusMasterController {
         modbusReadRequestDTO.setNumRegisters(numRegisters);
 
         return modbusMasterService.readRegisters(modbusReadRequestDTO);
+    }
+
+    @GetMapping("/read-coils/{slaveId}/{startAddress}/{count}")
+    public ResponseEntity<CoilReadResponseDTO> readCoils(
+            @RequestParam int slaveId,
+            @RequestParam int startAddress,
+            @RequestParam int count) {
+
+        CoilReadRequestDTO requestDTO = new CoilReadRequestDTO();
+        requestDTO.setSlaveId(slaveId);
+        requestDTO.setStartAddress(startAddress);
+        requestDTO.setCount(count);
+
+        return modbusMasterService.readCoils(requestDTO);
+    }
+
+    @GetMapping("/read-discrete-inputs/{slaveId}/{startAddress}/{count}")
+    public ResponseEntity<DiscreteInputReadResponseDTO> readDiscreteInputs(
+            @RequestParam int slaveId,
+            @RequestParam int startAddress,
+            @RequestParam int count) {
+
+        DiscreteInputReadRequestDTO requestDTO = new DiscreteInputReadRequestDTO();
+        requestDTO.setSlaveId(slaveId);
+        requestDTO.setStartAddress(startAddress);
+        requestDTO.setCount(count);
+
+        return modbusMasterService.readDiscreteInputs(requestDTO);
     }
 
 
