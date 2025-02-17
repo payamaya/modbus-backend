@@ -2,8 +2,6 @@ package com.controllers;
 
 import com.dto.*;
 import com.services.ModbusMasterService;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -20,7 +18,7 @@ public class ModbusMasterController {
     }
 
     // Endpoint to read multiple registers from the master
-    @GetMapping("/read")
+    @GetMapping("/read-registers")
     public ResponseEntity<ModbusReadResponseDTO> readData(
             @RequestParam int slaveId,
             @RequestParam int address,

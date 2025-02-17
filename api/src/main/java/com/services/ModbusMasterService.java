@@ -96,27 +96,19 @@ public class ModbusMasterService {
 
     public ResponseEntity<CoilReadResponseDTO> readCoils(CoilReadRequestDTO coilReadRequestDTO) {
         try {
-            Map<Integer, String> coilValues = executeModbusTransaction(
+            Map<Integer, String> coilValues = readModbusValues(
                     coilReadRequestDTO.getSlaveId(),
                     coilReadRequestDTO.getStartAddress(),
                     coilReadRequestDTO.getCount(),
                     ReadCoilsRequest::new,
-                    response -> {
-                        BitVector coils = ((ReadCoilsResponse) response).getCoils();
-                        Map<Integer, String> values = new HashMap<>();
-                        for (int i = 0; i < coils.size(); i++) {
-                            values.put(coilReadRequestDTO.getStartAddress() + i, coils.getBit(i) ? "ON" : "OFF");
-                        }
-                        return values;
-                    }
+                    response -> ((ReadCoilsResponse) response).getCoils()
             );
 
-            CoilReadResponseDTO responseDTO = new CoilReadResponseDTO();
-            responseDTO.setSlaveId(coilReadRequestDTO.getSlaveId());
-            responseDTO.setStartAddress(coilReadRequestDTO.getStartAddress());
-            responseDTO.setCoilValues(coilValues);
-
-            return ResponseEntity.ok(responseDTO);
+            return ResponseEntity.ok(new CoilReadResponseDTO(
+                    coilReadRequestDTO.getSlaveId(),
+                    coilReadRequestDTO.getStartAddress(),
+                    coilValues
+            ));
 
         } catch (ModbusException e) {
             throw new RuntimeException("Error reading Modbus coils.", e);
@@ -127,27 +119,19 @@ public class ModbusMasterService {
 
     public ResponseEntity<DiscreteInputReadResponseDTO> readDiscreteInputs(DiscreteInputReadRequestDTO discreteInputReadRequestDTO) {
         try {
-            Map<Integer, String> inputValues = executeModbusTransaction(
+            Map<Integer, String> inputValues = readModbusValues(
                     discreteInputReadRequestDTO.getSlaveId(),
                     discreteInputReadRequestDTO.getStartAddress(),
                     discreteInputReadRequestDTO.getCount(),
                     ReadInputDiscretesRequest::new,
-                    response -> {
-                        BitVector inputs = ((ReadInputDiscretesResponse) response).getDiscretes();
-                        Map<Integer, String> values = new HashMap<>();
-                        for (int i = 0; i < inputs.size(); i++) {
-                            values.put(discreteInputReadRequestDTO.getStartAddress() + i, inputs.getBit(i) ? "ON" : "OFF");
-                        }
-                        return values;
-                    }
+                    response -> ((ReadInputDiscretesResponse) response).getDiscretes()
             );
 
-            DiscreteInputReadResponseDTO responseDTO = new DiscreteInputReadResponseDTO();
-            responseDTO.setSlaveId(discreteInputReadRequestDTO.getSlaveId());
-            responseDTO.setStartAddress(discreteInputReadRequestDTO.getStartAddress());
-            responseDTO.setInputValues(inputValues);
-
-            return ResponseEntity.ok(responseDTO);
+            return ResponseEntity.ok(new DiscreteInputReadResponseDTO(
+                    discreteInputReadRequestDTO.getSlaveId(),
+                    discreteInputReadRequestDTO.getStartAddress(),
+                    inputValues
+            ));
 
         } catch (ModbusException e) {
             throw new RuntimeException("Error reading Modbus discrete inputs.", e);
@@ -155,6 +139,20 @@ public class ModbusMasterService {
             return ResponseEntity.badRequest().body(null);
         }
     }
+
+    private Map<Integer, String> readModbusValues(int slaveId, int startAddress, int count,
+                                                  BiFunction<Integer, Integer, ModbusRequest> requestSupplier,
+                                                  Function<ModbusResponse, BitVector> responseExtractor) throws ModbusException {
+        return executeModbusTransaction(slaveId, startAddress, count, requestSupplier, response -> {
+            BitVector bitVector = responseExtractor.apply(response);
+            Map<Integer, String> values = new HashMap<>();
+            for (int i = 0; i < bitVector.size(); i++) {
+                values.put(startAddress + i, bitVector.getBit(i) ? "ON" : "OFF");
+            }
+            return values;
+        });
+    }
+
 
     private <T extends ModbusResponse> Map<Integer, String> executeModbusTransaction(
             int slaveId,

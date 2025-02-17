@@ -7,6 +7,12 @@ public class DiscreteInputReadResponseDTO {
     private int startAddress;
     private Map<Integer, String> inputValues; // Map<Address, Value>
 
+    public DiscreteInputReadResponseDTO(int slaveId, int startAddress, Map<Integer, String> inputValues) {
+        this.slaveId = slaveId;
+        this.startAddress = startAddress;
+        this.inputValues = inputValues;
+    }
+
     // Getters and Setters
     public int getSlaveId() {
         return slaveId;
