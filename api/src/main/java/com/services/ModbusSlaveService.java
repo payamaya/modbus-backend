@@ -12,7 +12,6 @@ import org.springframework.stereotype.Service;
 
 import java.net.InetAddress;
 
-
 @Service
 public class ModbusSlaveService {
 

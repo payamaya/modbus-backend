@@ -2,6 +2,8 @@ package com.controllers;
 
 import com.dto.*;
 import com.services.ModbusMasterService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -11,8 +13,10 @@ import org.springframework.web.bind.annotation.*;
 public class ModbusMasterController {
     private final ModbusMasterService modbusMasterService;
 
+
     public ModbusMasterController(ModbusMasterService modbusMasterService) {
         this.modbusMasterService = modbusMasterService;
+
     }
 
     // Endpoint to read multiple registers from the master
@@ -30,7 +34,7 @@ public class ModbusMasterController {
         return modbusMasterService.readRegisters(modbusReadRequestDTO);
     }
 
-    @GetMapping("/read-coils/{slaveId}/{startAddress}/{count}")
+    @GetMapping("/read-coils")
     public ResponseEntity<CoilReadResponseDTO> readCoils(
             @RequestParam int slaveId,
             @RequestParam int startAddress,
@@ -44,7 +48,7 @@ public class ModbusMasterController {
         return modbusMasterService.readCoils(requestDTO);
     }
 
-    @GetMapping("/read-discrete-inputs/{slaveId}/{startAddress}/{count}")
+    @GetMapping("/read-discrete-inputs")
     public ResponseEntity<DiscreteInputReadResponseDTO> readDiscreteInputs(
             @RequestParam int slaveId,
             @RequestParam int startAddress,
