@@ -96,19 +96,16 @@ public class ModbusMasterService {
 
     public ResponseEntity<CoilReadResponseDTO> readCoils(CoilReadRequestDTO coilReadRequestDTO) {
         try {
-            Map<Integer, String> coilValues = readModbusValues(
-                    coilReadRequestDTO.getSlaveId(),
-                    coilReadRequestDTO.getStartAddress(),
-                    coilReadRequestDTO.getCount(),
-                    ReadCoilsRequest::new,
-                    response -> ((ReadCoilsResponse) response).getCoils()
-            );
+            ReadCoilsRequest request = new ReadCoilsRequest(coilReadRequestDTO.getStartAddress(), coilReadRequestDTO.getCount());
+            request.setUnitID(coilReadRequestDTO.getSlaveId());
 
-            return ResponseEntity.ok(new CoilReadResponseDTO(
-                    coilReadRequestDTO.getSlaveId(),
-                    coilReadRequestDTO.getStartAddress(),
-                    coilValues
-            ));
+            ModbusTCPTransaction transaction = new ModbusTCPTransaction(connection);
+            transaction.setRequest(request);
+            transaction.execute();
+
+            CoilReadResponseDTO coilReadResponseDTO = getCoilReadResponseDTO(coilReadRequestDTO, transaction);
+
+            return ResponseEntity.ok(coilReadResponseDTO);
 
         } catch (ModbusException e) {
             throw new RuntimeException("Error reading Modbus coils.", e);
@@ -117,21 +114,41 @@ public class ModbusMasterService {
         }
     }
 
+    private CoilReadResponseDTO getCoilReadResponseDTO(CoilReadRequestDTO coilReadRequestDTO, ModbusTCPTransaction transaction) {
+        ReadCoilsResponse response = (ReadCoilsResponse) transaction.getResponse();
+        BitVector bitVector = response.getCoils();
+
+        CoilReadResponseDTO coilReadResponseDTO = new CoilReadResponseDTO();
+        coilReadResponseDTO.setSlaveId(response.getUnitID());
+        coilReadResponseDTO.setStartAddress(coilReadRequestDTO.getStartAddress());
+        coilReadResponseDTO.setCoilValues(mapBitVectorToMap(bitVector, coilReadRequestDTO.getStartAddress()));
+        return coilReadResponseDTO;
+
+    }
+
+
     public ResponseEntity<DiscreteInputReadResponseDTO> readDiscreteInputs(DiscreteInputReadRequestDTO discreteInputReadRequestDTO) {
         try {
-            Map<Integer, String> inputValues = readModbusValues(
-                    discreteInputReadRequestDTO.getSlaveId(),
+            ReadInputDiscretesRequest request = new ReadInputDiscretesRequest(
                     discreteInputReadRequestDTO.getStartAddress(),
-                    discreteInputReadRequestDTO.getCount(),
-                    ReadInputDiscretesRequest::new,
-                    response -> ((ReadInputDiscretesResponse) response).getDiscretes()
+                    discreteInputReadRequestDTO.getCount()
             );
+            request.setUnitID(discreteInputReadRequestDTO.getSlaveId());
 
-            return ResponseEntity.ok(new DiscreteInputReadResponseDTO(
-                    discreteInputReadRequestDTO.getSlaveId(),
-                    discreteInputReadRequestDTO.getStartAddress(),
-                    inputValues
-            ));
+            ModbusTCPTransaction transaction = new ModbusTCPTransaction(connection);
+            transaction.setRequest(request);
+            transaction.execute();
+
+            ReadInputDiscretesResponse response = (ReadInputDiscretesResponse) transaction.getResponse();
+            BitVector bitVector = response.getDiscretes(); // ✅ Returns a BitVector
+
+            DiscreteInputReadResponseDTO discreteInputReadResponseDTO = new DiscreteInputReadResponseDTO();
+            discreteInputReadResponseDTO.setSlaveId(response.getUnitID());
+            discreteInputReadResponseDTO.setStartAddress(discreteInputReadRequestDTO.getStartAddress());
+            discreteInputReadResponseDTO.setCount(discreteInputReadRequestDTO.getCount());
+            discreteInputReadResponseDTO.setInputValues(mapBitVectorToMap(bitVector, discreteInputReadRequestDTO.getStartAddress())); // ✅ Now it's a Map<Integer, String>
+
+            return ResponseEntity.ok(discreteInputReadResponseDTO);
 
         } catch (ModbusException e) {
             throw new RuntimeException("Error reading Modbus discrete inputs.", e);
@@ -140,35 +157,12 @@ public class ModbusMasterService {
         }
     }
 
-    private Map<Integer, String> readModbusValues(int slaveId, int startAddress, int count,
-                                                  BiFunction<Integer, Integer, ModbusRequest> requestSupplier,
-                                                  Function<ModbusResponse, BitVector> responseExtractor) throws ModbusException {
-        return executeModbusTransaction(slaveId, startAddress, count, requestSupplier, response -> {
-            BitVector bitVector = responseExtractor.apply(response);
-            Map<Integer, String> values = new HashMap<>();
-            for (int i = 0; i < bitVector.size(); i++) {
-                values.put(startAddress + i, bitVector.getBit(i) ? "ON" : "OFF");
-            }
-            return values;
-        });
-    }
-
-
-    private <T extends ModbusResponse> Map<Integer, String> executeModbusTransaction(
-            int slaveId,
-            int startAddress,
-            int count,
-            BiFunction<Integer, Integer, ModbusRequest> requestCreator,
-            Function<T, Map<Integer, String>> responseMapper
-    ) throws ModbusException {
-        ModbusRequest request = requestCreator.apply(startAddress, count);
-        request.setUnitID(slaveId);
-
-        ModbusTCPTransaction transaction = new ModbusTCPTransaction(connection);
-        transaction.setRequest(request);
-        transaction.execute();
-
-        T response = (T) transaction.getResponse();
-        return responseMapper.apply(response);
+    private Map<Integer, String> mapBitVectorToMap(BitVector bitVector, int startAddress) {
+        Map<Integer, String> valuesMap = new HashMap<>();
+        for (int i = 0; i < bitVector.size(); i++) {
+            int address = startAddress + i;
+            valuesMap.put(address, bitVector.getBit(i) ? "ON" : "OFF");
+        }
+        return valuesMap;
     }
 }

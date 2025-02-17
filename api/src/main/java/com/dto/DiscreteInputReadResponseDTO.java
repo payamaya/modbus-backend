@@ -6,12 +6,7 @@ public class DiscreteInputReadResponseDTO {
     private int slaveId;
     private int startAddress;
     private Map<Integer, String> inputValues; // Map<Address, Value>
-
-    public DiscreteInputReadResponseDTO(int slaveId, int startAddress, Map<Integer, String> inputValues) {
-        this.slaveId = slaveId;
-        this.startAddress = startAddress;
-        this.inputValues = inputValues;
-    }
+    private int count;
 
     // Getters and Setters
     public int getSlaveId() {
@@ -32,6 +27,14 @@ public class DiscreteInputReadResponseDTO {
 
     public Map<Integer, String> getInputValues() {
         return inputValues;
+    }
+
+    public int getCount(){
+        return count;
+    }
+
+    public void setCount(int count){
+        this.count = count;
     }
 
     public void setInputValues(Map<Integer, String> inputValues) {

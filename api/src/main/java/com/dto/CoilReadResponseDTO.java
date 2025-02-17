@@ -7,12 +7,6 @@ public class CoilReadResponseDTO {
     private int startAddress;
     private Map<Integer, String> coilValues; // Map<Address, Value>
 
-    public CoilReadResponseDTO(int slaveId, int startAddress, Map<Integer, String> coilValues) {
-        this.slaveId = slaveId;
-        this.startAddress = startAddress;
-        this.coilValues = coilValues;
-    }
-
     // Getters and Setters
     public int getSlaveId() {
         return slaveId;
