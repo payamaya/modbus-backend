@@ -1,9 +1,7 @@
-package com.database.repository;
+package org.example.modbusbackend.database.repository;
 
-import com.database.model.ModbusData;
+import org.example.modbusbackend.database.model.ModbusData;
 import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.stereotype.Repository;
 
-@Repository
 public interface ModbusDataRepository extends JpaRepository<ModbusData, Long> {
 }

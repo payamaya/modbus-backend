@@ -1,9 +1,11 @@
-package com.dto;
+package org.example.modbusbackend.api.dto;
 
-public class CoilReadRequestDTO {
+import java.util.Map;
+
+public class CoilReadResponseDTO {
     private int slaveId;
     private int startAddress;
-    private int count;
+    private Map<Integer, String> coilValues; // Map<Address, Value>
 
     // Getters and Setters
     public int getSlaveId() {
@@ -22,11 +24,11 @@ public class CoilReadRequestDTO {
         this.startAddress = startAddress;
     }
 
-    public int getCount() {
-        return count;
+    public Map<Integer, String> getCoilValues() {
+        return coilValues;
     }
 
-    public void setCount(int count) {
-        this.count = count;
+    public void setCoilValues(Map<Integer, String> coilValues) {
+        this.coilValues = coilValues;
     }
 }

@@ -1,4 +1,4 @@
-package com.database.model;
+package org.example.modbusbackend.database.model;
 
 import jakarta.persistence.*;
 import lombok.*;
@@ -23,7 +23,8 @@ public class ModbusData {
     private int address;
 
     private Integer registerValue; // Holding & Input Registers
-    private Boolean coilValue; // Coils & Discrete Inputs
+    private Boolean coilValue; // Coils
+    private Boolean discreteValue; // Discrete Inputs
 
     private LocalDateTime timestamp;
 }

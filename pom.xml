@@ -8,12 +8,21 @@
         <version>3.4.2</version>
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
-    <groupId>org.example</groupId>
+
+    <groupId>org.example.modbusbackend</groupId>
     <artifactId>modbus-backend</artifactId>
-    <version>0.0.1-SNAPSHOT</version>
+    <version>1.0.0-SNAPSHOT</version>
     <packaging>pom</packaging>
+
+    <modules>
+        <module>api</module>
+        <module>database</module>
+        <module>modbus</module>
+    </modules>
+
     <name>modbus-backend</name>
     <description>modbus-backend</description>
+
     <url/>
     <licenses>
         <license/>
@@ -21,11 +30,7 @@
     <developers>
         <developer/>
     </developers>
-    <modules>
-        <module>api</module>
-        <module>database</module>
-        <module>modbus</module>
-    </modules>
+
     <scm>
         <connection/>
         <developerConnection/>
@@ -50,16 +55,17 @@
         </dependency>
 
         <dependency>
+            <groupId>org.hibernate.orm</groupId>
+            <artifactId>hibernate-community-dialects</artifactId>
+            <version>6.6.5.Final</version>
+        </dependency>
+
+        <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-test</artifactId>
             <scope>test</scope>
         </dependency>
 
-        <dependency>
-            <groupId>org.hibernate.orm</groupId>
-            <artifactId>hibernate-community-dialects</artifactId>
-            <version>6.2.0.Final</version>
-        </dependency>
 
     </dependencies>
 
@@ -69,8 +75,10 @@
             <plugin>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
+                <version>3.4.2</version>
             </plugin>
         </plugins>
     </build>
+
 
 </project>

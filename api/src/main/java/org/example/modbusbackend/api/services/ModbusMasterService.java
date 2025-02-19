@@ -1,15 +1,15 @@
-package com.services;
+package org.example.modbusbackend.api.services;
 
-import com.dto.*;
 import com.ghgande.j2mod.modbus.ModbusException;
 import com.ghgande.j2mod.modbus.io.ModbusTCPTransaction;
 import com.ghgande.j2mod.modbus.msg.*;
 import com.ghgande.j2mod.modbus.net.TCPMasterConnection;
 import com.ghgande.j2mod.modbus.util.BitVector;
-import com.database.model.ModbusData;
-import com.database.repository.ModbusDataRepository;
+import org.example.modbusbackend.api.dto.*;
 import jakarta.annotation.PostConstruct;
 import jakarta.annotation.PreDestroy;
+import org.example.modbusbackend.database.model.ModbusData;
+import org.example.modbusbackend.database.repository.ModbusDataRepository;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -21,6 +21,7 @@ import java.sql.SQLException;
 import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
+
 
 @Service
 public class ModbusMasterService {
@@ -39,18 +40,23 @@ public class ModbusMasterService {
     @PostConstruct
     public void initialize() {
         try {
-
             InetAddress address = InetAddress.getByName(slaveIp);
             connection = new TCPMasterConnection(address);
             connection.setPort(slavePort);
             connection.connect();
 
+            if (!connection.isConnected()) {
+                System.err.println("Modbus connection failed. Exiting application...");
+                System.exit(1); // Force shutdown
+            }
 
             System.out.println("Modbus connection established.");
         } catch (Exception e) {
-            throw new RuntimeException("Failed to connect to Modbus slave.", e);
+            System.err.println("Failed to connect to Modbus slave: " + e.getMessage());
+            System.exit(1); // Force shutdown
         }
     }
+
     public ModbusMasterService(ModbusDataRepository repository, DataSource dataSource) {
         this.repository = repository;
         this.dataSource = dataSource;
@@ -205,7 +211,11 @@ public class ModbusMasterService {
             data.setType(type);
             data.setSlaveId(slaveId);
             data.setAddress(address);
-            data.setCoilValue(value.equals("ON"));
+            if ("COIL".equals(type)) {
+                data.setCoilValue(value.equals("ON"));
+            } else if ("DISCRETE_INPUT".equals(type)) {
+                data.setDiscreteValue(value.equals("ON"));
+            }
             data.setTimestamp(LocalDateTime.now());
             repository.save(data);
         });
