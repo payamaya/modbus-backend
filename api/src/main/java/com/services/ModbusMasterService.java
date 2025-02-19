@@ -6,13 +6,19 @@ import com.ghgande.j2mod.modbus.io.ModbusTCPTransaction;
 import com.ghgande.j2mod.modbus.msg.*;
 import com.ghgande.j2mod.modbus.net.TCPMasterConnection;
 import com.ghgande.j2mod.modbus.util.BitVector;
+import com.model.ModbusData;
+import com.repository.ModbusDataRepository;
 import jakarta.annotation.PostConstruct;
 import jakarta.annotation.PreDestroy;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
+import javax.sql.DataSource;
 import java.net.InetAddress;
+import java.sql.Connection;
+import java.sql.SQLException;
+import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -20,6 +26,9 @@ import java.util.Map;
 public class ModbusMasterService {
 
     private TCPMasterConnection connection;
+    private final DataSource dataSource;
+
+    private final ModbusDataRepository repository;
 
     @Value("${modbus.slave.ip}")
     private String slaveIp;
@@ -42,6 +51,19 @@ public class ModbusMasterService {
             throw new RuntimeException("Failed to connect to Modbus slave.", e);
         }
     }
+    public ModbusMasterService(ModbusDataRepository repository, DataSource dataSource) {
+        this.repository = repository;
+        this.dataSource = dataSource;
+    }
+
+    @PostConstruct
+    public void logDatabasePath() {
+        try (Connection conn = dataSource.getConnection()) {
+            System.out.println("Connected to SQLite database at: " + conn.getMetaData().getURL());
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
 
     @PreDestroy
     public void cleanup() {
@@ -54,6 +76,7 @@ public class ModbusMasterService {
             System.err.println("Error closing Modbus connection: " + e.getMessage());
         }
     }
+
 
     private int[] createRegisterArray(ReadMultipleRegistersResponse response){
         int[] registerValues = new int[response.getWordCount()];
@@ -81,14 +104,29 @@ public class ModbusMasterService {
             modbusReadResponseDTO.setNumRegisters(response.getWordCount());
             modbusReadResponseDTO.setRegisterValues(createRegisterArray(response));
 
+            // Store Data in DB
+            saveRegisterData(response.getUnitID(), modbusReadRequestDTO.getAddress(), createRegisterArray(response));
 
-            return ResponseEntity.ok((modbusReadResponseDTO));
+            return ResponseEntity.ok(modbusReadResponseDTO);
 
         } catch (ModbusException e) {
             throw new RuntimeException("Error reading Modbus registers.", e);
         } catch (Exception e) {
             return ResponseEntity.badRequest().body(null);
-            //throw new RuntimeException(e);
+        }
+    }
+
+    private void saveRegisterData(int slaveId, int startAddress, int[] values) {
+        for (int i = 0; i < values.length; i++) {
+            ModbusData data = new ModbusData();
+            data.setType("HOLDING_REGISTER");
+            data.setSlaveId(slaveId);
+            data.setAddress(startAddress + i);
+            data.setRegisterValue(values[i]);
+            data.setTimestamp(LocalDateTime.now());
+
+            System.out.println("Saving data: " + data);
+            repository.save(data);
         }
     }
 
@@ -102,6 +140,9 @@ public class ModbusMasterService {
             transaction.execute();
 
             CoilReadResponseDTO coilReadResponseDTO = getCoilReadResponseDTO(coilReadRequestDTO, transaction);
+
+            // Store Data in DB
+            saveBooleanData("COIL", coilReadResponseDTO.getSlaveId(), coilReadResponseDTO.getStartAddress(), coilReadResponseDTO.getCoilValues());
 
             return ResponseEntity.ok(coilReadResponseDTO);
 
@@ -138,13 +179,16 @@ public class ModbusMasterService {
             transaction.execute();
 
             ReadInputDiscretesResponse response = (ReadInputDiscretesResponse) transaction.getResponse();
-            BitVector bitVector = response.getDiscretes(); // ✅ Returns a BitVector
+            BitVector bitVector = response.getDiscretes();
 
             DiscreteInputReadResponseDTO discreteInputReadResponseDTO = new DiscreteInputReadResponseDTO();
             discreteInputReadResponseDTO.setSlaveId(response.getUnitID());
             discreteInputReadResponseDTO.setStartAddress(discreteInputReadRequestDTO.getStartAddress());
             discreteInputReadResponseDTO.setCount(discreteInputReadRequestDTO.getCount());
-            discreteInputReadResponseDTO.setInputValues(mapBitVectorToMap(bitVector, discreteInputReadRequestDTO.getStartAddress())); // ✅ Now it's a Map<Integer, String>
+            discreteInputReadResponseDTO.setInputValues(mapBitVectorToMap(bitVector, discreteInputReadRequestDTO.getStartAddress()));
+
+            // Store Data in DB
+            saveBooleanData("DISCRETE_INPUT", response.getUnitID(), discreteInputReadRequestDTO.getStartAddress(), discreteInputReadResponseDTO.getInputValues());
 
             return ResponseEntity.ok(discreteInputReadResponseDTO);
 
@@ -153,6 +197,18 @@ public class ModbusMasterService {
         } catch (Exception e) {
             return ResponseEntity.badRequest().body(null);
         }
+    }
+
+    private void saveBooleanData(String type, int slaveId, int startAddress, Map<Integer, String> values) {
+        values.forEach((address, value) -> {
+            ModbusData data = new ModbusData();
+            data.setType(type);
+            data.setSlaveId(slaveId);
+            data.setAddress(address);
+            data.setCoilValue(value.equals("ON"));
+            data.setTimestamp(LocalDateTime.now());
+            repository.save(data);
+        });
     }
 
     private Map<Integer, String> mapBitVectorToMap(BitVector bitVector, int startAddress) {
