@@ -6,12 +6,6 @@ import org.springframework.context.annotation.ComponentScan;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 
 @SpringBootApplication
-@ComponentScan(basePackages = {
-        "org.example.modbusbackend.api",
-        "org.example.modbusbackend.database"
-})
-@EnableJpaRepositories(basePackages = "org.example.modbusbackend.database.repository")
-
 public class Application {
     public static void main(String[] args) {
         SpringApplication.run(Application.class, args);
