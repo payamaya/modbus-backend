@@ -1,11 +1,9 @@
 package com.dto;
 
-import java.util.Map;
-
 public class DiscreteInputReadResponseDTO {
     private int slaveId;
     private int startAddress;
-    private Map<Integer, String> inputValues; // Map<Address, Value>
+    private boolean[] discreteValues; // Map<Address, Value>
     private int count;
 
     // Getters and Setters
@@ -25,8 +23,12 @@ public class DiscreteInputReadResponseDTO {
         this.startAddress = startAddress;
     }
 
-    public Map<Integer, String> getInputValues() {
-        return inputValues;
+    public boolean[] getDiscreteValues() {
+        return discreteValues;
+    }
+
+    public void setDiscreteValues(boolean[] discreteValues) {
+        this.discreteValues = discreteValues;
     }
 
     public int getCount(){
@@ -37,7 +39,4 @@ public class DiscreteInputReadResponseDTO {
         this.count = count;
     }
 
-    public void setInputValues(Map<Integer, String> inputValues) {
-        this.inputValues = inputValues;
-    }
 }
