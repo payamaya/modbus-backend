@@ -27,4 +27,60 @@ public class ModbusData {
     private Boolean discreteValue; // Discrete Inputs
 
     private LocalDateTime timestamp;
+
+    public void setType(String type) {
+        this.type = type;
+    }
+
+    public String getType() {
+        return type;
+    }
+
+    public void setSlaveId(int slaveId) {
+        this.slaveId = slaveId;
+    }
+
+    public int getSlaveId() {
+        return slaveId;
+    }
+
+    public void setAddress(int address) {
+        this.address = address;
+    }
+
+    public int getAddress() {
+        return address;
+    }
+
+    public void setRegisterValue(int registerValue) {
+        this.registerValue = registerValue;
+    }
+
+    public int getRegisterValue() {
+        return registerValue;
+    }
+
+    public void setTimestamp(LocalDateTime timestamp) {
+        this.timestamp = timestamp;
+    }
+
+    public LocalDateTime getTimestamp() {
+        return timestamp;
+    }
+
+    public void setCoilValue(boolean coilValue) {
+        this.coilValue = coilValue;
+    }
+
+    public boolean isCoilValue() {
+        return coilValue;
+    }
+
+    public void setDiscreteValue(boolean discreteValue) {
+        this.discreteValue = discreteValue;
+    }
+
+    public boolean isDiscreteValue() {
+        return discreteValue;
+    }
 }
