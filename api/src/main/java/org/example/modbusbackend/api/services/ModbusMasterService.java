@@ -22,7 +22,6 @@ import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
 
-
 @Service
 public class ModbusMasterService {
 
@@ -83,16 +82,6 @@ public class ModbusMasterService {
         }
     }
 
-
-    private int[] createRegisterArray(ReadMultipleRegistersResponse response){
-        int[] registerValues = new int[response.getWordCount()];
-
-        for (int i = 0; i < response.getWordCount(); i++){
-            registerValues[i] = response.getRegisterValue(i);
-        }
-        return registerValues;
-    }
-
     public ResponseEntity<ModbusReadResponseDTO> readRegisters(ModbusReadRequestDTO modbusReadRequestDTO) {
         try {
             ReadMultipleRegistersRequest request = new ReadMultipleRegistersRequest(modbusReadRequestDTO.getAddress(), modbusReadRequestDTO.getNumRegisters());
@@ -113,7 +102,7 @@ public class ModbusMasterService {
             // Store Data in DB
             saveRegisterData(response.getUnitID(), modbusReadRequestDTO.getAddress(), createRegisterArray(response));
 
-            return ResponseEntity.ok(modbusReadResponseDTO);
+            return ResponseEntity.ok((modbusReadResponseDTO));
 
         } catch (ModbusException e) {
             throw new RuntimeException("Error reading Modbus registers.", e);
@@ -171,30 +160,18 @@ public class ModbusMasterService {
 
     }
 
-
     public ResponseEntity<DiscreteInputReadResponseDTO> readDiscreteInputs(DiscreteInputReadRequestDTO discreteInputReadRequestDTO) {
         try {
-            ReadInputDiscretesRequest request = new ReadInputDiscretesRequest(
-                    discreteInputReadRequestDTO.getStartAddress(),
-                    discreteInputReadRequestDTO.getCount()
-            );
-            request.setUnitID(discreteInputReadRequestDTO.getSlaveId());
-
-            ModbusTCPTransaction transaction = new ModbusTCPTransaction(connection);
-            transaction.setRequest(request);
-            transaction.execute();
-
-            ReadInputDiscretesResponse response = (ReadInputDiscretesResponse) transaction.getResponse();
-            BitVector bitVector = response.getDiscretes();
+            ReadInputDiscretesResponse response = getReadInputDiscretesResponse(discreteInputReadRequestDTO);
 
             DiscreteInputReadResponseDTO discreteInputReadResponseDTO = new DiscreteInputReadResponseDTO();
             discreteInputReadResponseDTO.setSlaveId(response.getUnitID());
             discreteInputReadResponseDTO.setStartAddress(discreteInputReadRequestDTO.getStartAddress());
             discreteInputReadResponseDTO.setCount(discreteInputReadRequestDTO.getCount());
-            discreteInputReadResponseDTO.setInputValues(mapBitVectorToMap(bitVector, discreteInputReadRequestDTO.getStartAddress()));
+            discreteInputReadResponseDTO.setDiscreteValues(createDiscreteValuesArray(response.getDiscretes(), discreteInputReadRequestDTO.getCount()));
 
-            // Store Data in DB
-            saveBooleanData("DISCRETE_INPUT", response.getUnitID(), discreteInputReadRequestDTO.getStartAddress(), discreteInputReadResponseDTO.getInputValues());
+            saveBooleanData("DISCRETE_INPUT", response.getUnitID(), discreteInputReadRequestDTO.getStartAddress(), discreteInputReadResponseDTO.getInputValues());discreteInputReadResponseDTO.setDiscreteValues(createDiscreteValuesArray(response.getDiscretes(), discreteInputReadRequestDTO.getCount()));
+
 
             return ResponseEntity.ok(discreteInputReadResponseDTO);
 
@@ -204,6 +181,8 @@ public class ModbusMasterService {
             return ResponseEntity.badRequest().body(null);
         }
     }
+
+
 
     private void saveBooleanData(String type, int slaveId, int startAddress, Map<Integer, String> values) {
         values.forEach((address, value) -> {
@@ -221,6 +200,29 @@ public class ModbusMasterService {
         });
     }
 
+    private ReadInputDiscretesResponse getReadInputDiscretesResponse(DiscreteInputReadRequestDTO discreteInputReadRequestDTO) throws ModbusException {
+        ReadInputDiscretesRequest request = new ReadInputDiscretesRequest(
+                discreteInputReadRequestDTO.getStartAddress(),
+                discreteInputReadRequestDTO.getCount()
+        );
+        request.setUnitID(discreteInputReadRequestDTO.getSlaveId());
+
+        ModbusTCPTransaction transaction = new ModbusTCPTransaction(connection);
+        transaction.setRequest(request);
+        transaction.execute();
+
+        return (ReadInputDiscretesResponse) transaction.getResponse();
+    }
+
+    private int[] createRegisterArray(ReadMultipleRegistersResponse response){
+        int[] registerValues = new int[response.getWordCount()];
+
+        for (int i = 0; i < response.getWordCount(); i++){
+            registerValues[i] = response.getRegisterValue(i);
+        }
+        return registerValues;
+    }
+
     private Map<Integer, String> mapBitVectorToMap(BitVector bitVector, int startAddress) {
         Map<Integer, String> valuesMap = new HashMap<>();
         for (int i = 0; i < bitVector.size(); i++) {
@@ -228,5 +230,14 @@ public class ModbusMasterService {
             valuesMap.put(address, bitVector.getBit(i) ? "ON" : "OFF");
         }
         return valuesMap;
+    }
+
+    private boolean[] createDiscreteValuesArray(BitVector bitVector, int count){
+        boolean[] discreteValues = new boolean[count];
+
+        for (int i = 0; i < count; i++){
+            discreteValues[i] = bitVector.getBit(i);
+        }
+        return discreteValues;
     }
 }
