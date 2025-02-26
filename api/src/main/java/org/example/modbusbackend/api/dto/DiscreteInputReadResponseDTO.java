@@ -1,9 +1,12 @@
 package org.example.modbusbackend.api.dto;
 
+import java.util.Map;
+
 public class DiscreteInputReadResponseDTO {
     private int slaveId;
     private int startAddress;
     private boolean[] discreteValues; // Map<Address, Value>
+    private Map<Integer, String> inputValues; // Map<Address, Value>
     private int count;
 
     // Getters and Setters
@@ -39,4 +42,11 @@ public class DiscreteInputReadResponseDTO {
         this.count = count;
     }
 
+    public Map<Integer, String> getInputValues() {
+        return inputValues;
+    }
+
+    public void setInputValues(Map<Integer, String> inputValues) {
+        this.inputValues = inputValues;
+    }
 }

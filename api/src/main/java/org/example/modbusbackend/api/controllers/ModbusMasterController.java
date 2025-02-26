@@ -21,13 +21,13 @@ public class ModbusMasterController {
     @GetMapping("/read-registers")
     public ResponseEntity<ModbusReadResponseDTO> readData(
             @RequestParam int slaveId,
-            @RequestParam int address,
-            @RequestParam int numRegisters) {
+            @RequestParam int startAddress,
+            @RequestParam int count) {
 
         ModbusReadRequestDTO modbusReadRequestDTO = new ModbusReadRequestDTO();
         modbusReadRequestDTO.setSlaveId(slaveId);
-        modbusReadRequestDTO.setAddress(address);
-        modbusReadRequestDTO.setNumRegisters(numRegisters);
+        modbusReadRequestDTO.setAddress(startAddress);
+        modbusReadRequestDTO.setNumRegisters(count);
 
         return modbusMasterService.readRegisters(modbusReadRequestDTO);
     }
