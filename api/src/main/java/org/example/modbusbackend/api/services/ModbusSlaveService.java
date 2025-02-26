@@ -1,6 +1,6 @@
-package com.services;
+package org.example.modbusbackend.api.services;
 
-import com.dto.ModbusWriteSingleRegisterRequestDTO;
+import org.example.modbusbackend.api.dto.ModbusWriteSingleRegisterRequestDTO;
 import com.ghgande.j2mod.modbus.io.ModbusTCPTransaction;
 import com.ghgande.j2mod.modbus.msg.WriteSingleRegisterRequest;
 import com.ghgande.j2mod.modbus.net.TCPMasterConnection;

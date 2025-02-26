@@ -1,7 +1,7 @@
-package com.controllers;
+package org.example.modbusbackend.api.controllers;
 
-import com.dto.*;
-import com.services.ModbusMasterService;
+import org.example.modbusbackend.api.dto.*;
+import org.example.modbusbackend.api.services.ModbusMasterService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 

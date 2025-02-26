@@ -1,6 +1,6 @@
-package com.dto;
+package org.example.modbusbackend.api.dto;
 
-public class DiscreteInputReadRequestDTO {
+public class CoilReadRequestDTO {
     private int slaveId;
     private int startAddress;
     private int count;

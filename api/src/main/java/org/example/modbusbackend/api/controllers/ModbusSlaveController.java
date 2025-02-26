@@ -1,7 +1,7 @@
-package com.controllers;
+package org.example.modbusbackend.api.controllers;
 
-import com.dto.ModbusWriteSingleRegisterRequestDTO;
-import com.services.ModbusSlaveService;
+import org.example.modbusbackend.api.dto.ModbusWriteSingleRegisterRequestDTO;
+import org.example.modbusbackend.api.services.ModbusSlaveService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;

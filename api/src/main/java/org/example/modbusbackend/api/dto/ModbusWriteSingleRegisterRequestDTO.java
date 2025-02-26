@@ -1,4 +1,4 @@
-package com.dto;
+package org.example.modbusbackend.api.dto;
 
 public class ModbusWriteSingleRegisterRequestDTO {
     private int slaveId;

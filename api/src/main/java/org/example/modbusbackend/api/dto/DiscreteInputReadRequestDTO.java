@@ -1,9 +1,8 @@
-package com.dto;
+package org.example.modbusbackend.api.dto;
 
-public class DiscreteInputReadResponseDTO {
+public class DiscreteInputReadRequestDTO {
     private int slaveId;
     private int startAddress;
-    private boolean[] discreteValues; // Map<Address, Value>
     private int count;
 
     // Getters and Setters
@@ -23,20 +22,11 @@ public class DiscreteInputReadResponseDTO {
         this.startAddress = startAddress;
     }
 
-    public boolean[] getDiscreteValues() {
-        return discreteValues;
-    }
-
-    public void setDiscreteValues(boolean[] discreteValues) {
-        this.discreteValues = discreteValues;
-    }
-
-    public int getCount(){
+    public int getCount() {
         return count;
     }
 
-    public void setCount(int count){
+    public void setCount(int count) {
         this.count = count;
     }
-
 }
