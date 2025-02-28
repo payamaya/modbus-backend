@@ -168,18 +168,7 @@ public class ModbusMasterService {
     public ResponseEntity<DiscreteInputReadResponseDTO> readDiscreteInputs(DiscreteInputReadRequestDTO discreteInputReadRequestDTO) {
         try {
             // Read the discrete inputs from Modbus
-            ReadInputDiscretesRequest request = new ReadInputDiscretesRequest(
-                    discreteInputReadRequestDTO.getStartAddress(),
-                    discreteInputReadRequestDTO.getCount()
-            );
-            request.setUnitID(discreteInputReadRequestDTO.getSlaveId());
-
-            ModbusTCPTransaction transaction = new ModbusTCPTransaction(connection);
-            transaction.setRequest(request);
-            transaction.execute();
-
-            // Get response from transaction
-            ReadInputDiscretesResponse response = (ReadInputDiscretesResponse) transaction.getResponse();
+            ReadInputDiscretesResponse response = getInputDiscreteResponse(discreteInputReadRequestDTO);
             BitVector bitVector = response.getDiscretes();
 
             // Create response DTO
@@ -200,6 +189,21 @@ public class ModbusMasterService {
         } catch (Exception e) {
             return ResponseEntity.badRequest().body(null);
         }
+    }
+
+    private ReadInputDiscretesResponse getInputDiscreteResponse(DiscreteInputReadRequestDTO discreteInputReadRequestDTO) throws ModbusException {
+        ReadInputDiscretesRequest request = new ReadInputDiscretesRequest(
+                discreteInputReadRequestDTO.getStartAddress(),
+                discreteInputReadRequestDTO.getCount()
+        );
+        request.setUnitID(discreteInputReadRequestDTO.getSlaveId());
+
+        ModbusTCPTransaction transaction = new ModbusTCPTransaction(connection);
+        transaction.setRequest(request);
+        transaction.execute();
+
+        // Get response from transaction
+        return (ReadInputDiscretesResponse) transaction.getResponse();
     }
 
 
@@ -225,24 +229,7 @@ public class ModbusMasterService {
             System.out.println(existingDataOpt.isPresent() ? "Updated boolean data: " + modbusData : "Inserted new boolean data: " + modbusData);
         });
     }
-
-
-
-
-    private ReadInputDiscretesResponse getReadInputDiscretesResponse(DiscreteInputReadRequestDTO discreteInputReadRequestDTO) throws ModbusException {
-        ReadInputDiscretesRequest request = new ReadInputDiscretesRequest(
-                discreteInputReadRequestDTO.getStartAddress(),
-                discreteInputReadRequestDTO.getCount()
-        );
-        request.setUnitID(discreteInputReadRequestDTO.getSlaveId());
-
-        ModbusTCPTransaction transaction = new ModbusTCPTransaction(connection);
-        transaction.setRequest(request);
-        transaction.execute();
-
-        return (ReadInputDiscretesResponse) transaction.getResponse();
-    }
-
+    
     private int[] createRegisterArray(ReadMultipleRegistersResponse response){
         int[] registerValues = new int[response.getWordCount()];
 
@@ -261,12 +248,4 @@ public class ModbusMasterService {
         return valuesMap;
     }
 
-    private boolean[] createDiscreteValuesArray(BitVector bitVector, int count){
-        boolean[] discreteValues = new boolean[count];
-
-        for (int i = 0; i < count; i++){
-            discreteValues[i] = bitVector.getBit(i);
-        }
-        return discreteValues;
-    }
 }
