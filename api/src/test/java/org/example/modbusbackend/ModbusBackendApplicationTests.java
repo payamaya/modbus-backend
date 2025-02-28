@@ -1,11 +1,10 @@
 package org.example.modbusbackend;
 
-
-import com.controllers.ModbusMasterController;
-import com.dto.ModbusReadRequestDTO;
-import com.dto.ModbusReadResponseDTO;
 import com.ghgande.j2mod.modbus.net.TCPMasterConnection;
-import com.services.ModbusMasterService;
+import org.example.modbusbackend.api.dto.ModbusReadRequestDTO;
+import org.example.modbusbackend.api.dto.ModbusReadResponseDTO;
+import org.example.modbusbackend.api.controllers.ModbusMasterController;
+import org.example.modbusbackend.api.services.ModbusMasterService;
 import org.junit.jupiter.api.Test;
 
 import org.mockito.InjectMocks;
