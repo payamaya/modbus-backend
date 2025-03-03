@@ -17,7 +17,6 @@
     <modules>
         <module>api</module>
         <module>database</module>
-        <module>modbus</module>
     </modules>
 
     <name>modbus-backend</name>
