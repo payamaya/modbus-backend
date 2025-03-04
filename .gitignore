@@ -33,4 +33,4 @@ build/
 .vscode/
 
 ### Database ###
-.db
+*.db
